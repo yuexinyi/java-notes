@@ -456,4 +456,91 @@ int newCapacity = oldCapacity + ((capacityIncrement > 0) ?
 
 
 
-## 
+## 2.Set
+
+### 2.1Set接口
+
+#### 2.1.1出现版本
+
+JDK1.2
+
+#### 2.1.2特点
+
+- 不允许数据重复
+- 本质是Map接口，value值相同的Map接⼝ 
+
+```java
+public TreeSet() {
+        this(new TreeMap<E,Object>());
+    }
+```
+
+- 只实现了Collection接口，并没有对其扩充
+
+#### 2.1.3常用子类
+
+- HashSet：无序存储
+- TreeSet：有序存储
+
+![1581936138854](C:\Users\岳心怡\AppData\Roaming\Typora\typora-user-images\1581936138854.png)
+
+### 2.2TreeSet
+
+#### 2.2.1出现版本
+
+JDK1.2
+
+#### 2.2.2特点
+
+- 底层实现：红黑树
+- 有序存储--按照升序存储；
+- 不允许存放null；
+- 不允许数据重复：利用实现Comparable接口/传入外部比较器接口的返回值判断是否重复
+
+#### 2.2.3基本操作
+
+代码：
+
+```java
+package SaveSingle.RSet;
+
+import java.util.Set;
+import java.util.TreeSet;
+
+public class test {
+    public static void main(String[] args) {
+        Set<String> set = new TreeSet<>();
+        set.add("C") ;
+        set.add("C") ;
+        set.add("D") ;
+        set.add("B") ;
+        set.add("A") ;
+        System.out.println(set) ;
+    }
+}
+```
+
+输出：
+
+![1581936504168](C:\Users\岳心怡\AppData\Roaming\Typora\typora-user-images\1581936504168.png)
+
+结论：TreeSet中不允许元素重复并且升序存储
+
+#### 2.3.3TreeSet的升序解析
+
+首先明白排序无非是所在类实现了Comparable接口（内部比较器）或者Comparator（外部比较器）
+
+https://blog.csdn.net/weixin_44369212/article/details/103215685
+
+在实际使用之中，使用TreeSet过于麻烦了。项目开发之中，简单java类是根据数据表设计得来的，如果一个类的属性很多，那么比较起来就很麻烦了。所以我们一般使用的是HashSet。 
+
+### 2.3HashSet
+
+#### 2.3.1出现版本
+
+JDK1.2
+
+#### 2.3.2特点
+
+不允许重复的无序存储
+
