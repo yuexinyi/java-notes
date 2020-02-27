@@ -509,3 +509,51 @@ public class test {
 
 以后就使用UTF-8
 
+# 5.内存流
+
+1.定义
+
+IO操作也可以发生在内存中，这种流称为内存操作流。
+
+需求：需要进行IO处理，但是又不希望产生文件。这种情况下可以使用内存作为操作终端
+
+内存流分类：
+
+- 字节内存流：ByteArrayInputStream、ByteArrayOutputStream
+- 字符内存流：CharArrayReader、CharArrayWriter
+
+2.继承关系
+
+内存输出流
+
+![1582810049942](C:\Users\岳心怡\AppData\Roaming\Typora\typora-user-images\1582810049942.png)
+
+内存输入流
+
+![1582810062419](C:\Users\岳心怡\AppData\Roaming\Typora\typora-user-images\1582810062419.png)
+
+3.实现
+
+内存流实现大小写转换
+
+```java
+package com.iotest.RStream;
+
+import java.io.*;
+
+public class test {
+    public static void main(String[] args) throws IOException {
+        InputStream in = new ByteArrayInputStream("hello".getBytes());
+        OutputStream out = new ByteArrayOutputStream();
+        int temp = 0;
+        while ((temp = in.read()) != -1){
+            // 每个字节进行处理,处理之后所有数据都在outputStream类中
+            out.write(Character.toUpperCase(temp));
+        }
+        System.out.println(out);
+        in.close();
+        out.close();
+    }
+}
+```
+
