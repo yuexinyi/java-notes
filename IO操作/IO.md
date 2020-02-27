@@ -287,6 +287,7 @@ public class test {
             int len = in.read(data);//将文件内容读取到data字节数组中，返回读取长度
             String result = new String(data,0,len);//将字节数组内容转换为字符串
             System.out.println("hello.txt的文件内容为：["+result+"]");//输出文件内容
+            in.close();
         }
     }
 }
@@ -353,10 +354,103 @@ public class test {
 }
 ```
 
+部分内容输出实现：
+
+```java
+package com.iotest.RStream;
+
+import java.io.*;
+
+public class test {
+    public static void main(String[] args) throws IOException {
+        File file = new File("D:"+File.separator+"testio"+File.separator+"out.txt");
+        OutputStream out = new FileOutputStream(file,true);
+        out.write("\nhello,java".getBytes(),0,5);//存储\nhell
+        out.close();
+    }
+}
+```
+
 
 
 ## 2.4字符输入流Reader
 
+1.定义
+
+在程序中读取内容操作
+
+2.常用方法
+
+Reader类中没有方法可以直接读取字符串类型，只能通过字符数组进行读取操作
+
+- 读取字符数组的全部内容：public int read(char cbuf[]);
+- 读取字符数组的部分内容：public int read(char cbuf[],int off,int len);
+- 读取单个字符：public int read();
+
+3.实现
+
+```java
+package com.iotest.RStream;
+
+import java.io.*;
+
+public class test {
+    public static void main(String[] args) throws IOException {
+        File file = new File("D:"+File.separator+"testio"+File.separator+"out.txt");
+        if (file.exists()) {
+            Reader in = new FileReader(file) ;
+            char[] data = new char[1024] ;
+            int len = in.read(data) ; // 将数据读取到字符数组中
+            String result = new String(data, 0, len) ;
+            System.out.println("读取内容【"+result+"】") ;
+            in.close();
+        }
+    }
+}
+```
+
 
 
 ## 2.5字符输出流Writer
+
+字符适合处理中文数据
+
+1.定义
+
+与OutputStream非常相似，只是Write对中文的支持很好，字符不需要转换为字节数组
+
+比OutputStream相比多了一个Appendable接口
+
+```
+public abstract class Writer implements Appendable,Closeable,Flushable
+```
+
+2.常用方法
+
+给定字符输出：public void write(String str);
+
+3.实现
+
+```java
+package com.iotest.RStream;
+
+import java.io.*;
+
+public class test {
+    public static void main(String[] args) throws IOException {
+        File file = new File("D:"+File.separator+"testio"+File.separator+"out.txt");
+        Writer writer = new FileWriter(file);
+        writer.write("\ni like eat");//字符直接写入
+        writer.close();
+    }
+}
+```
+
+
+
+
+
+
+
+
+
