@@ -226,7 +226,7 @@ File类不支持文件内容操作，如果要处理文件内容，必须通过�
 
 2.字符流:Reader、Writer
 
-## 2.1输入流和输出流
+## 2.1流操作
 
 字节操作流
 
@@ -244,7 +244,7 @@ File类不支持文件内容操作，如果要处理文件内容，必须通过�
 
 3.而所有磁盘中的数据必须先读取到内存后才能进行操作，而内存中会将字节->字符。字符更适合处理中文
 
-## 2.1字节流/字符流的操作流程
+### 字节流/字符流的操作流程
 
 （文件操作为例）
 
@@ -448,9 +448,64 @@ public class test {
 
 
 
+## 2.6字节流VS字符流
+
+1.字符流适合处理中文，字节流适合处理一切数据类型（对中文支持不好）
+
+2.实际开发中，字节流一定是优先考虑的（图片，音乐，文字），只有在处理中文时才会考虑字符流
+
+3.所有的字符流操作，无论是写入还是输出，数据都是先保存在缓存中的；如果字符流不关闭，数据就有可能保存在缓存中并没有输出的目标源，这种情况必须强制刷新
 
 
 
+# 3.转换流
 
+字符流<=>字节流
 
+1.定义
+
+转换流：将字节流和字符流互转
+
+- OutputStreamWriter:字节输出流->字符输出流
+- InputStreamReader:字节输入流->字符输入流
+
+2.实现
+
+```java
+package com.iotest.RStream;
+
+import java.io.*;
+
+public class test {
+    public static void main(String[] args) throws IOException {
+        File file = new File("D:"+File.separator+"testio"+File.separator+"out.txt");
+        if (file.exists()) {
+            OutputStream out = new FileOutputStream(file);
+            OutputStreamWriter ow = new OutputStreamWriter(out);//字节流->字符流
+            ow.write("hello");
+            ow.close();
+        }
+    }
+}
+```
+
+# 4.字符编码
+
+## 4.1常用字符编码
+
+1.GBK、GB2312:描述中文的编码；GBK包含简体中文和繁体中文，GB2312只包含简体中文
+
+2.UNICODE：java提供的16进制编码；存在问题：如果现在所有字母都使用，编码太庞大，造成网络负担
+
+3.ISO 8859-1:国际通用编码，但是所有编码都需要进行转换
+
+4.UTF:结合了UNICODE和ISO 8859-1;需要使用16进制文字使用UNICODE，字母使用ISO 8859-1
+
+## 4.2乱码产生原因
+
+本地系统所用编码和程序所用编码不同，强制转换就会出现乱码
+
+乱码产生本质：编码和解码不统一
+
+以后就使用UTF-8
 
