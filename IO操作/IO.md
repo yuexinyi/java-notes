@@ -557,3 +557,56 @@ public class test {
 }
 ```
 
+合并文件
+
+```java
+package com.iotest.RStream;
+
+import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
+
+import java.io.*;
+
+public class test {
+    public static void main(String[] args) throws IOException {
+        //data_a.txt和data_b.txt文件为合并的两个文件
+        File[] files = {new File("D:"+File.separator+"testio"+File.separator+"data_a.txt"),
+                new File("D:"+File.separator+"testio"+File.separator+"data_b.txt")};
+        String[] data = new String[2];//存储两个文件内容的字符数组
+        for (int i = 0;i < files.length;i++){
+            data[i] = readFile(files[i]);
+        }
+        StringBuffer buffer = new StringBuffer();
+        String[] contentA = data[0].split(" ");
+        String[] contentB = data[1].split(" ");
+        for (int i = 0;i < contentA.length;i++){
+            //文件合并
+            buffer.append(contentA[i]).append("(").append(contentB[i]).append(")").append(" ");
+        }
+        //打印合并字符串
+        System.out.println(buffer);
+        //将合并内容写入新建文件data_merge.txt
+        File file = new File("D:"+File.separator+"testio"+File.separator+"data_merge.txt");
+        FileWriter writer = new FileWriter(file);
+        writer.write(String.valueOf(buffer));//将StringBuffer->String
+        writer.flush();//刷新
+        writer.close();//关闭输出流
+    }
+
+
+    public static String readFile(File file) throws IOException {
+        InputStream in = new FileInputStream(file);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        int temp = 0;
+        byte[] data = new byte[10];
+        while ((temp = in.read(data)) != -1){//将file文件内容读入data字节数组，返回读取字节个数
+            // 每个字节进行处理,处理之后所有数据都在内存中，不会产生文件
+            out.write(data,0,temp);
+        }
+        in.close();
+        out.close();
+        return new String(out.toByteArray());
+    }
+}
+```
+
+如果只是使用InputStream类，在进行数据完整读取的时候会很不方便，结合内存流的使用会好很多
