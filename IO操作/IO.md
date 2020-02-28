@@ -610,3 +610,191 @@ public class test {
 ```
 
 如果只是使用InputStream类，在进行数据完整读取的时候会很不方便，结合内存流的使用会好很多
+
+# 6.打印流
+打印流解决的是OutputStream的设计缺陷，属于OutputStream功能的加强版。如果操作的不是二进制数据，只是想通过程序向终端目标输出信息的话，OutputStream不是很方便，有以下两个缺点：
+
+- 所有数据必须转换为字节数组
+- 如果输出的是int、double等类型就不方便
+
+## 6.1打印流概念
+
+设计的主要目的是解决OutputStream的设计问题，其本质不会脱离OutputStream
+
+
+```
+package com.iotest.RStream;
+
+import java.io.*;
+
+/**
+ * @Author:Star
+ * @Date:Created in 11:42 2020/2/28
+ * @Description:
+ */
+
+class printUtil{
+    private OutputStream out;
+
+    public printUtil(OutputStream out) {
+        this.out = out;
+    }
+
+    // 核心功能就一个
+    public void print(String str){
+        try {
+            this.out.write(str.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void println(String str){
+        this.print(str+"\n");
+    }
+
+    //打印int数据
+    public void print(int data){
+        this.print(String.valueOf(data));
+    }
+
+    public void println(int data){
+        this.println(String.valueOf(data));
+    }
+
+    //打印double数据
+    public void print(double data){
+        this.println(String.valueOf(data));
+    }
+
+    public void println(double data){
+        this.println(String.valueOf(data));
+    }
+
+}
+
+
+public class test1 {
+    public static void main(String[] args) throws FileNotFoundException {
+        printUtil printUtil = new printUtil(new FileOutputStream(new File("D:"+File.separator+"testio"+File.separator+"text.txt")));
+        printUtil.print("姓名：");
+        printUtil.println("star");
+        printUtil.print("年龄");
+        printUtil.println(18);
+    }
+}
+```
+经过简单的处理之后，本质就是对OutputStream的功能做了一个封装而已。java提供专门的打印流处理类：PrintStream、PrintWriter
+
+## 6.2系统打印流
+
+字节打印流：PrintStream
+
+字符打印流：PrintWriter
+
+打印流的设计属于装饰设计模式：核心依然是某个类的功能，但是为了得到更好的操作效果，让其支持的功能多一些。
+
+栗子：打印流的使用以及格式化输出
+
+```
+package com.iotest.RStream;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
+
+public class test2 {
+    public static void main(String[] args) throws FileNotFoundException {
+        String name = "star";
+        int age = 20;
+        //使用系统的打印流
+        PrintWriter printWriter = new PrintWriter(new FileOutputStream(new File("D:"+File.separator+"testio"+File.separator+"text.txt")));
+        printWriter.printf("姓名:%s,年龄:%d",name,age);//格式化输出
+        printWriter.close();
+    }
+}
+```
+
+# 7.System类对IO的支持
+实际上我们一直在使用的系统输出就是利用了IO流的模式完成，在System类中定义了三个操作的常量。
+
+1.标准输出：public final static PrintStream out
+
+2.错误输出：public final static PrintStream err
+
+3.标准输入：public final static InputStream in
+
+## 7.1系统输出
+
+系统输出一共有两个常量：out、err，并且这两个常量表示的都是PrintStream类的对象
+
+1.out输出的是希望用户能看到的内容
+2.err输出的是不希望用户看到的内容
+
+注意：由于System.out是PrintStream的实例化对象，而PrintStream又是OutputStream的子类，所以可以直接使用System.out直接为OutputStream实例化，这个时候的OutputStream输出的位置将变为屏幕。
+
+栗子：使用System.out为OutputStream实例化
+
+```
+package com.iotest.RStream;
+
+import java.io.*;
+
+public class test2 {
+    public static void main(String[] args) throws IOException {
+        OutputStream out = System.out;
+        out.write("hello".getBytes());
+    }
+}
+```
+## 7.2系统输入
+
+System.in对应的类型是InputStream，而这种输入流指的是用户通过键盘输入。Java本身没有直接的用户输入处理，要实现这种操作，必须使用java.io模式来完成
+
+栗子：使用InputStream实现数据输入
+
+```
+package com.iotest.RStream;
+
+import java.io.*;
+
+public class test2 {
+    public static void main(String[] args) throws IOException {
+        InputStream in = System.in;//实例化输入流对象
+        byte[] bytes = new byte[1024];//创建新的字节数组
+        System.out.println("请输入内容：");
+        int temp = in.read(bytes);//读取输入到字节数组中
+        System.out.println("输入内容为："+new String(bytes,0,temp));//将字节数组中的内容转换为字符输出
+    }
+}
+```
+上面的程序存在一个问题：创建的新的字节数组长度固定，如果输入长度大于字节数组的长度，那么只能接受部分数据，此时可以借助内存流来改善这一现象
+
+
+```
+package com.iotest.RStream;
+
+import java.io.*;
+
+public class test2 {
+    public static void main(String[] args) throws IOException {
+        InputStream in = System.in;//实例化输入流对象
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        byte[] bytes = new byte[10];//创建新的字节数组
+        System.out.println("请输入内容：");
+        int temp = 0;
+        while ((temp = in.read(bytes)) != -1){//读取输入到字节数组中
+            out.write(bytes,0,temp);
+            //需要用户判断，因为此时的输入流不是内存流，需要数组来暂存输入内容
+            if (temp < bytes.length){
+                break;
+            }
+        }
+        System.out.println("输入内容为："+new String(out.toByteArray()));
+        in.close();
+        out.close();
+    }
+}
+```
+
