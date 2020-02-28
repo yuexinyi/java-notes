@@ -798,3 +798,128 @@ public class test2 {
 }
 ```
 
+# 8.两种输入流
+
+## 8.1BufferedReader类
+BufferedReader类是一个缓冲的输入流，而且是一个字符流操作对象，java中有两类缓冲流：字节缓冲流BufferedInputStream、字符缓冲流BufferedReader
+
+解决问题：IuputStream的缺陷，需要字节数组来接受读取的内容。
+
+BufferedReader的常用方法：
+读取一行数据：
+```
+String readLine();
+```
+栗子：使用BufferedReader实现键盘输入
+
+```
+package com.iotest.RStream;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+public class test3 {
+    public static void main(String[] args) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        System.out.println("请输入内容：");
+        String string = reader.readLine();//读取数据
+        System.out.println("输入内容为："+string);
+    }
+}
+```
+注意：BufferedReader还有一个最大特点就是接受的数据类型为String,可以使用String类的各类操进行数据处理变成各种常见数据类型
+
+## 8.2Scanner类
+
+定义：专门进行输入流处理的程序类，利用这个类可以方便处理各种数据类型
+
+解决问题：BufferedReader的缺陷，更加的方便，有各种常见数据的读取方法，减少转型处理
+
+常见方法：
+1.判断是否有指定数据类型：public boolean hasNextXXX()
+
+2.取得指定类型的数据：public 数据类型 nextXXX()
+
+3.定义分隔符：public Scanner useDelimiter(Pattern pattern)
+
+4.构造方法：public Scanner(InputStream source)
+
+栗子：使用Scanner实现数据输入
+
+```
+package com.iotest.RStream;
+
+import java.io.IOException;
+import java.util.Scanner;
+
+public class test3 {
+    public static void main(String[] args) throws IOException {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("请输入年龄：");
+        if (scanner.hasNextInt()) {
+            // 有输入内容,不判断空字符串
+            int age = scanner.nextInt();
+            System.out.println("输入内容为: " + age);
+        } else {
+            System.out.println("输入的不是数字!");
+        }
+        scanner.close();
+    }
+}
+```
+总结：除了对二进制文件的拷贝处理外，针对程序的信息输出使用打印流（PrintStream、PrintWriter），信息输入使用Scanner
+
+# 9.序列化
+
+1.定义
+
+对象序列化：对象->二进制数据流
+
+2.实现
+
+```
+package com.iotest.RStream;
+
+import java.io.*;
+
+class Person implements Serializable {
+    private String name;
+    private int age;
+
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    @Override
+    public String toString() {
+        return "Person{" +
+                "name='" + name + '\'' +
+                ", age=" + age +
+                '}';
+    }
+}
+
+public class test4 {
+    public static final File file = new File("D:"+File.separator+"testio"+File.separator+"text.txt");
+    public static void main(String[] args) throws IOException {
+        ser(new Person("张三",18));
+    }
+
+    //序列化
+    public static void ser(Object person) throws IOException {
+        ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file));
+        out.writeObject(person);
+        out.close();
+    }
+
+    //反序列化
+    public static void dser() throws IOException, ClassNotFoundException {
+        ObjectInputStream in = new ObjectInputStream(new FileInputStream(file));
+        in.readObject();
+        in.close();
+    }
+}
+```
+注意：Serializable默认会将对象中所有属性进行序列化保存。如果希望某些属性不被保存，可以使用transient关键字
