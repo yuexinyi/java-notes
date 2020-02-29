@@ -1,0 +1,110 @@
+本篇围绕三个问题展开：
+
+1.什么是序列化？什么又是反序列化？
+
+2.为什么要有序列化这个东西？
+
+3.怎么用呢？
+
+问题一：什么是序列化，反序列化？
+当进程在通信时，不管数据在终端是何种格式，在网络上传输均以二进制序列的形式进行传输。
+
+（注意：所有的数据传输不是靠着空气传输的，而是通过电流传输的。这里的二进制01代码对应电平的高低电平）
+
+序列化：Java对象->字节序列（二进制流）
+
+反序列化：字节序列（二进制流）->Java对象
+
+（注意：对象的序列化和反序列化与平台无关。也就是说，在一个平台上序列化的对象可以在另一个平台反序列化）
+
+问题二：为什么要有序列化这个东西？
+1.网络传输的便利
+
+2.磁盘存储对象
+
+问题三：怎么用呢？
+1.Java中的对象序列化类
+
+ObjectOutputStream:对象输出流（writeObject(Object obj)---将对象转化为二进制序列写入）
+
+
+
+ObjectInputStream:对象输入流(readObject(Object obj)---将二进制流转化为对象读取)
+
+
+
+2.对象实现Serializable接口
+
+Serializable接口：标识这个类需要序列化
+
+注意：Serializable默认会将对象中所有属性进行序列化保存。如果希望某些属性不被保存，可以使用transient关键字
+
+栗子：
+
+将Person对象序列化反序列化
+
+package com.iotest.RStream;
+
+import java.io.*;
+
+class Person implements Serializable {
+    private String name;
+    private int age;
+
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    @Override
+    public String toString() {
+        return "Person{" +
+                "name='" + name + '\'' +
+                ", age=" + age +
+                '}';
+    }
+}
+
+public class test4 {
+    public static final File file = new File("D:"+File.separator+"testio"+File.separator+"text.txt");
+    public static void main(String[] args) throws IOException, ClassNotFoundException {
+        ser(new Person("张三",18));
+        Person p = (Person) dser();
+        System.out.println("反序列化对象："+"Person[name="+p.getName()+",age="+p.getAge()+"]");
+    }
+
+    //序列化
+    public static void ser(Object person) throws IOException {
+        ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file));
+        out.writeObject(person);
+        System.out.println("序列化成功");
+        out.close();
+    }
+
+    //反序列化
+    public static Object dser() throws IOException, ClassNotFoundException {
+        ObjectInputStream in = new ObjectInputStream(new FileInputStream(file));
+        Object obj = in.readObject();
+        System.out.println("反序列化成功");
+        in.close();
+        return obj;
+    }
+}
+
+序列化对象输出到text.txt文件中：
+
+结论：使用Serializable接口默认对对象的所有属性均序列化
+
+3.使用transient关键字忽略我们不希望进行序列化的变量（比如：name）
+
+private transient String name;
+
+结论：可以发现name属性使用transient关键字修饰后，并没有被序列化。
